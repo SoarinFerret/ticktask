@@ -19,7 +19,7 @@ import (
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:     "add",
-	Aliases: []string{"a", "log"},
+	Aliases: []string{"a"},
 	Short:   "Add tasks / todo to the database",
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {

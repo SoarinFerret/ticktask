@@ -163,3 +163,49 @@ func ReopenTask(id int) (*todo.Task, error) {
 
 	return task, nil
 }
+
+func AddTimeToTask(id int, duration time.Duration, override bool) (*todo.Task, error) {
+	_, err := GetTask(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// task exists in context, so now we need to get a full list of tasks
+	// so when we save, it doesn't overwrite the list with just the filtered task list
+	list, err := todo.LoadFromPath(config.GetTodoTxtPath())
+	if err != nil {
+		return nil, err
+	}
+
+	// get task by id
+	task, err := list.GetTask(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// add time to task
+	if _, exists := task.AdditionalTags["time"]; !exists {
+		if task.AdditionalTags == nil {
+			task.AdditionalTags = make(map[string]string)
+		}
+		task.AdditionalTags["time"] = duration.String()
+	} else {
+		// add time to existing time
+		existingDuration, err := time.ParseDuration(task.AdditionalTags["time"])
+		if err != nil {
+			return nil, err
+		}
+		if override {
+			existingDuration = 0
+		}
+		task.AdditionalTags["time"] = (existingDuration + duration).String()
+	}
+
+	// save tasks
+	err = list.WriteToPath(config.GetTodoTxtPath())
+	if err != nil {
+		return nil, err
+	}
+
+	return task, nil
+}
