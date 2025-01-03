@@ -1,0 +1,104 @@
+/*
+Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+*/
+package cmd
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/pterm/pterm"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+
+	"github.com/soarinferret/ticktask/internal/profile"
+)
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:   "tt",
+	Short: "Simple todo and task logging tool",
+	Long: `A simple todo and task logging tool using the command line.
+Based on the todo.txt format, this tool is designed to help
+you keep track of the time you spend on tasks in as simple 
+and unobtrusive way as possible.`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		c, _ := cmd.Flags().GetString("config")
+		if c != "" {
+			viper.SetConfigFile(c)
+			err := viper.ReadInConfig()
+			if err != nil {
+				pExit("Error reading config file: ", err)
+			}
+		}
+
+		p, _ := cmd.Flags().GetString("profile")
+		if p != "" {
+			profile.SetActiveProfile(p, false)
+		}
+		n, _ := cmd.Flags().GetBool("no-profile")
+		if n {
+			profile.UnsetActiveProfile(false)
+		}
+	},
+	// Uncomment the following line if your bare application
+	// has an action associated with it:
+	// Run: func(cmd *cobra.Command, args []string) { },
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	cmd, _, err := rootCmd.Find(os.Args[1:])
+	// default cmd if no cmd is given
+	if err == nil && cmd.Use == rootCmd.Use && cmd.Flags().Parse(os.Args[1:]) != pflag.ErrHelp {
+		args := append([]string{addCmd.Use}, os.Args[1:]...)
+		rootCmd.SetArgs(args)
+	}
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func init() {
+	// Here you will define your flags and configuration settings.
+	// Cobra supports persistent flags, which, if defined here,
+	// will be global for your application.
+
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.commitment-clock.yaml)")
+
+	// Cobra also supports local flags, which will only run
+	// when this action is called directly.
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// flag for the auth key
+
+	rootCmd.PersistentFlags().StringP("config", "C", "", "Alternate configuration file to use")
+	rootCmd.PersistentFlags().StringP("profile", "P", "", "Override the active profile")
+	rootCmd.PersistentFlags().BoolP("no-profile", "N", false, "Ignore the active profile")
+
+	//viper.BindPFlag("auth", rootCmd.PersistentFlags().Lookup("auth"))
+	//viper.BindPFlag("server", rootCmd.PersistentFlags().Lookup("server"))
+}
+
+func globalArgsHandler(args []string) (projects []string, contexts []string) {
+	// parse the arguments
+	for _, arg := range args {
+		if arg[0] == '+' {
+			projects = append(projects, arg[1:])
+		} else if arg[0] == '@' {
+			contexts = append(contexts, arg[1:])
+		}
+	}
+	return
+}
+
+func pExit(s string, err error) {
+	if err != nil {
+		pterm.Error.Println(s, err)
+		os.Exit(1)
+	}
+}
