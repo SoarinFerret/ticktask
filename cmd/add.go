@@ -4,7 +4,6 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"os"
 	"strings"
 	"time"
 
@@ -49,15 +48,11 @@ var addCmd = &cobra.Command{
 
 		// add priority
 		if priority != "" {
-			// make sure priority is uppercase and a single character
-			priority = strings.ToUpper(priority)
-			p := priority[0]
-			if p >= 'A' && p <= 'Z' {
-				task.Priority = string(p)
-			} else {
-				pterm.Error.Println("Invalid priority:", priority)
-				os.Exit(1)
+			p, err := formatPriority(priority)
+			if err != nil {
+				pExit("Error parsing priority: ", err)
 			}
+			task.Priority = p
 		}
 
 		task, err = todotxt.AddTask(*task)

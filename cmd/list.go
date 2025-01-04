@@ -103,13 +103,13 @@ func printListTable(list todo.TaskList) {
 
 	// Add header
 	if dueDate && completionDate {
-		listData = append(listData, []string{"ID", "Due", "Priority", "Task", "TimeSpent", "Completed"})
+		listData = append(listData, []string{"ID", "Due", "Pri", "Task", "TimeSpent", "Completed"})
 	} else if dueDate {
-		listData = append(listData, []string{"ID", "Due", "Priority", "Task", "TimeSpent"})
+		listData = append(listData, []string{"ID", "Due", "Pri", "Task", "TimeSpent"})
 	} else if completionDate {
-		listData = append(listData, []string{"ID", "Priority", "Task", "TimeSpent", "Completed"})
+		listData = append(listData, []string{"ID", "Pri", "Task", "TimeSpent", "Completed"})
 	} else {
-		listData = append(listData, []string{"ID", "Priority", "Task", "TimeSpent"})
+		listData = append(listData, []string{"ID", "Pri", "Task", "TimeSpent"})
 	}
 
 	for _, task := range list {

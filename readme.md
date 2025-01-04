@@ -36,6 +36,7 @@ Available Commands:
   help        Help about any command
   list        List all tasks
   log         Add time spent to a todo
+  priority    Set the priority of a task
   profile     Manage local profiles
   remove      Remove tasks / todo from the file
   reopen      Reopen a completed task

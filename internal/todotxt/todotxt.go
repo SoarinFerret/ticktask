@@ -209,3 +209,34 @@ func AddTimeToTask(id int, duration time.Duration, override bool) (*todo.Task, e
 
 	return task, nil
 }
+
+func SetPriority(id int, priority string) (*todo.Task, error) {
+	_, err := GetTask(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// task exists in context, so now we need to get a full list of tasks
+	// so when we save, it doesn't overwrite the list with just the filtered task list
+	list, err := todo.LoadFromPath(config.GetTodoTxtPath())
+	if err != nil {
+		return nil, err
+	}
+
+	// get task by id
+	task, err := list.GetTask(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// add priority
+	task.Priority = priority
+
+	// save tasks
+	err = list.WriteToPath(config.GetTodoTxtPath())
+	if err != nil {
+		return nil, err
+	}
+
+	return task, nil
+}
