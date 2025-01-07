@@ -25,6 +25,7 @@ var addCmd = &cobra.Command{
 		priority, _ := cmd.Flags().GetString("priority")
 
 		timeSpent, _ := cmd.Flags().GetString("time")
+		complete, _ := cmd.Flags().GetBool("complete")
 		timeDuration, err := time.ParseDuration(timeSpent)
 		if err != nil {
 			pExit("Error parsing time: ", err)
@@ -53,6 +54,11 @@ var addCmd = &cobra.Command{
 				pExit("Error parsing priority: ", err)
 			}
 			task.Priority = p
+		}
+
+		// mark as complete if flag is set
+		if complete {
+			task.Complete()
 		}
 
 		task, err = todotxt.AddTask(*task)
@@ -92,5 +98,6 @@ func init() {
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	addCmd.Flags().StringP("time", "t", "0m", "The time spent on the task")
 	addCmd.Flags().StringP("priority", "p", "", "The priority of the task (A-Z)")
+	addCmd.Flags().BoolP("complete", "c", false, "Mark the task as complete")
 
 }
