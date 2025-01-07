@@ -28,7 +28,7 @@ Usage:
 
 Available Commands:
   add         Add tasks / todo to the database
-  archive     Archiive done todos older than a specified date
+  archive     Archive done todos older than a specified date
   close       Mark a task as complete
   completion  Generate the autocompletion script for the specified shell
   config      View the current configuration
