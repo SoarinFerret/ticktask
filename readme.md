@@ -11,10 +11,11 @@ Note: _I built the original version of this tool for my own use in about a day o
 - Task Git synchronization
 - Backend is based on todo.txt format
 - Time tracking for tasks
+- Cross platform - Windows, MacOS, Linux (in theory, not tested beyond Linux)
 
 ## Usage
 
-Below is rough planned usage for the tool. Because it uses [cobra](https://github.com/spf13/cobra) for the command line interface, the best way to see the currently available commands is to run `tt help`.
+Below is rough planned usage for the tool. However, it is under active development, and I may not update this very regularly. But, because it uses [cobra](https://github.com/spf13/cobra) for the command line interface, the best way to see the currently available commands is to run `tt help`.
 
 ```
 A simple todo and task logging tool using the command line.
@@ -76,6 +77,16 @@ Below is the format of a todo.txt file. This is the format that TickTask uses to
 
 - Image from: [https://github.com/todotxt/todo.txt](https://github.com/todotxt/todo.txt)
 
+## Building
+
+To build the tool, you will need to have Go installed on your system. You can then clone the repository and build the tool using the following commands:
+
+```bash
+$ git clone https://github.com/SoarinFerret/ticktask.git
+$ cd ticktask
+$ go build -ldflags="-s -w" ./cmd/tt
+```
+
 ## Special Thanks
 
 This is fortunately / unfortunately not the first cli todo tool I have used or written. I have been inspired by the following tools and projects:
@@ -85,3 +96,7 @@ This is fortunately / unfortunately not the first cli todo tool I have used or w
   - Provided inspiration for the git synchronization and context management (renamed profile) features.
 - [Todo.txt](https://github.com/todotxt/todo.txt) - I like the simplicity of this format and the tools that have been built around it. I just extended it to include time tracking.
 - [go-todotxt](https://github.com/KEINOS/go-todotxt/) - A go library for parsing todo.txt files. This library handles the parsing of todo.txt files in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
