@@ -1,6 +1,6 @@
 module github.com/soarinferret/ticktask
 
-go 1.23.4
+go 1.22.6
 
 require (
 	github.com/KEINOS/go-todotxt v1.2.0
