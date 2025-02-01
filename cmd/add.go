@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pterm/pterm"
 	"github.com/soarinferret/ticktask/internal/git"
 	"github.com/soarinferret/ticktask/internal/todotxt"
 	"github.com/spf13/cobra"
@@ -72,15 +71,8 @@ var addCmd = &cobra.Command{
 			pExit("Error committing task: ", err)
 		}
 
-		// print task info
-		pterm.Info.Println("Task:", task.Task())
-		pterm.Info.Println("Priority:", task.Priority)
-		pterm.Info.Println("Contexts:", task.Contexts)
-		pterm.Info.Println("Projects:", task.Projects)
-		pterm.Info.Println("Time:", task.AdditionalTags["time"])
-
-		//pterm.Error.Println("not implemented")
-
+		// print task
+		printListTable([]todo.Task{*task})
 	},
 }
 

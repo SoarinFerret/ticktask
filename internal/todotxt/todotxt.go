@@ -35,7 +35,14 @@ func AddTask(task todo.Task) (*todo.Task, error) {
 		return nil, err
 	}
 
-	return &task, nil
+	// overwrite task so projects & contexts are included in output
+	// this is a hacky way to do this, but it works for now
+	returnTask, err := todo.ParseTask(task.String())
+	if err != nil {
+		return nil, err
+	}
+
+	return returnTask, nil
 }
 
 // GetTasks returns all tasks from the todo.txt file
