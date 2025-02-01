@@ -26,18 +26,18 @@ func AddTask(task todo.Task) (*todo.Task, error) {
 		return nil, err
 	}
 
-	// add task
-	list.AddTask(&task)
-
-	// save tasks
-	err = list.WriteToPath(config.GetTodoTxtPath())
+	// overwrite task so projects & contexts are included in output
+	// this is a hacky way to do this, but it works for now
+	returnTask, err := todo.ParseTask(task.String())
 	if err != nil {
 		return nil, err
 	}
 
-	// overwrite task so projects & contexts are included in output
-	// this is a hacky way to do this, but it works for now
-	returnTask, err := todo.ParseTask(task.String())
+	// add task
+	list.AddTask(returnTask)
+
+	// save tasks
+	err = list.WriteToPath(config.GetTodoTxtPath())
 	if err != nil {
 		return nil, err
 	}
