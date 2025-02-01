@@ -102,7 +102,7 @@ func AddProfile(name string, active bool, projects []string, contexts []string) 
 		Name:     name,
 		Projects: projects,
 		Contexts: contexts,
-		Active:   true,
+		Active:   active,
 	})
 
 	// if active, set all other profiles to inactive
