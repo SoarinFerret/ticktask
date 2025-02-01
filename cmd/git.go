@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/soarinferret/ticktask/internal/git"
 )
@@ -150,6 +153,18 @@ var gitStatusCmd = &cobra.Command{
 	},
 }
 
+var gitLocationCmd = &cobra.Command{
+	Use:     "location",
+	Aliases: []string{},
+	Short:   "Print absolute path to the git repository",
+	Long:    ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		// don't use pterm here, we want to print the path only
+		path := viper.GetString("task_path")
+		fmt.Println(path)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(gitCmd)
 	rootCmd.AddCommand(rootSyncCmd)
@@ -161,4 +176,5 @@ func init() {
 	gitCmd.AddCommand(gitSyncCmd)
 	gitCmd.AddCommand(gitRemoteCmd)
 	gitCmd.AddCommand(gitStatusCmd)
+	gitCmd.AddCommand(gitLocationCmd)
 }
