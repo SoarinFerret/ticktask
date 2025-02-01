@@ -76,10 +76,6 @@ func SaveConfig() error {
 	return nil
 }
 
-func GetSetup() string {
-	return viper.GetString("task_path")
-}
-
 func GetSSHPublicKeyPath() string {
 	return viper.GetString("ssh_key")
 }
