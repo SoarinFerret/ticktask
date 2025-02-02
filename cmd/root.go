@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/soarinferret/ticktask/internal/profile"
+	"github.com/soarinferret/ticktask/internal/git"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -19,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Short: "Simple todo and task logging tool",
 	Long: `A simple todo and task logging tool using the command line.
 Based on the todo.txt format, this tool is designed to help
-you keep track of the time you spend on tasks in as simple 
+you keep track of the time you spend on tasks in as simple
 and unobtrusive way as possible.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		c, _ := cmd.Flags().GetString("config")
@@ -39,6 +40,8 @@ and unobtrusive way as possible.`,
 		if n {
 			profile.UnsetActiveProfile(false)
 		}
+
+		initializeSetup()
 	},
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -91,5 +94,25 @@ func pExit(s string, err error) {
 	if err != nil {
 		pterm.Error.Println(s, err)
 		os.Exit(1)
+	}
+}
+
+func initializeSetup() {
+	// offer to create the task repository or clone it
+	// if the task repository does not exist
+	_, err := os.Stat(viper.GetString("task_path") + "/.git")
+	if os.IsNotExist(err) {
+		result, _ := pterm.DefaultInteractiveConfirm.Show("Task repository does not exist. Would you like to create it?")
+		if !result {
+			pterm.Info.Println("Exiting...")
+			os.Exit(0)
+		}
+
+		// create the task repository
+		err := git.Init()
+		if err != nil {
+			pExit("Error creating task repository", err)
+		}
+		pterm.Info.Println("Initialized git repository")
 	}
 }
