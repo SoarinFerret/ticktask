@@ -247,3 +247,40 @@ func SetPriority(id int, priority string) (*todo.Task, error) {
 
 	return task, nil
 }
+
+func EditTask(task todo.Task) (*todo.Task, error) {
+	_, err := GetTask(task.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// task exists in context, so now we need to get a full list of tasks
+	// so when we save, it doesn't overwrite the list with just the filtered task list
+	list, err := todo.LoadFromPath(config.GetTodoTxtPath())
+	if err != nil {
+		return nil, err
+	}
+
+	// get task by id
+	oldTask, err := list.GetTask(task.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// update task
+	oldTask.Priority = task.Priority
+	oldTask.Completed = task.Completed
+	oldTask.CompletedDate = task.CompletedDate
+	oldTask.CreatedDate = task.CreatedDate
+	oldTask.AdditionalTags = task.AdditionalTags
+	oldTask.DueDate = task.DueDate
+	oldTask.Todo = task.Todo
+
+	// save tasks
+	err = list.WriteToPath(config.GetTodoTxtPath())
+	if err != nil {
+		return nil, err
+	}
+
+	return oldTask, nil
+}

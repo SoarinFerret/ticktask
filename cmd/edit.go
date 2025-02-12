@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"strconv"
 	"github.com/pterm/pterm"
 	"github.com/soarinferret/ticktask/internal/config"
 	"github.com/soarinferret/ticktask/internal/edit"
 	"github.com/soarinferret/ticktask/internal/git"
+	"github.com/soarinferret/ticktask/internal/todotxt"
 	"github.com/spf13/cobra"
+	"github.com/KEINOS/go-todotxt/todo"
 )
 
 var editCmd = &cobra.Command{
@@ -14,7 +17,30 @@ var editCmd = &cobra.Command{
 	Short:   "Edit the todo.txt file",
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		edit.OpenFile(config.GetTodoTxtPath())
+		// if no arguments, open the todo.txt file
+		if len(args) == 0 {
+			edit.OpenFile(config.GetTodoTxtPath())
+		} else {
+			id, _ := strconv.Atoi(args[0])
+
+			task, err := todotxt.GetTask(id)
+			if err != nil {
+				pExit("Error getting task:", err)
+			}
+
+			taskString, _ := pterm.DefaultInteractiveTextInput.WithDefaultValue(task.String()).Show()
+
+			newTask, err := todo.ParseTask(taskString)
+			if err != nil {
+				pExit("Error parsing task:", err)
+			}
+
+			newTask.ID = task.ID
+			task, err = todotxt.EditTask(*newTask)
+			if err != nil {
+				pExit("Error editing task:", err)
+			}
+		}
 
 		noCommit, _ := cmd.Flags().GetBool("no-commit")
 		if !noCommit {
