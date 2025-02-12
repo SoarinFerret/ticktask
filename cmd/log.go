@@ -5,10 +5,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pterm/pterm"
 	"github.com/soarinferret/ticktask/internal/git"
 	"github.com/soarinferret/ticktask/internal/todotxt"
 	"github.com/spf13/cobra"
+
+	"github.com/KEINOS/go-todotxt/todo"
 )
 
 var logCmd = &cobra.Command{
@@ -79,7 +80,7 @@ var logCmd = &cobra.Command{
 		}
 
 		// print new task time
-		pterm.Info.Println("Time updated for", strconv.Itoa(task.ID)+":", task.AdditionalTags["time"])
+		printListTable([]todo.Task{*task})
 	},
 }
 
