@@ -3,6 +3,7 @@ package cmd
 import (
 	"strconv"
 	"time"
+	"strings"
 
 	"github.com/KEINOS/go-todotxt/todo"
 	"github.com/spf13/cobra"
@@ -137,7 +138,7 @@ func printListTable(list todo.TaskList) {
 				strconv.Itoa(task.ID),
 				dueDateStr,
 				priorityStr,
-				task.Todo,
+				wordWrap(task.Todo),
 				task.AdditionalTags["time"],
 				completedStr,
 			}
@@ -146,14 +147,14 @@ func printListTable(list todo.TaskList) {
 				strconv.Itoa(task.ID),
 				dueDateStr,
 				priorityStr,
-				task.Todo,
+				wordWrap(task.Todo),
 				task.AdditionalTags["time"],
 			}
 		} else if completionDate {
 			listItem = []string{
 				strconv.Itoa(task.ID),
 				priorityStr,
-				task.Todo,
+				wordWrap(task.Todo),
 				task.AdditionalTags["time"],
 				completedStr,
 			}
@@ -161,7 +162,7 @@ func printListTable(list todo.TaskList) {
 			listItem = []string{
 				strconv.Itoa(task.ID),
 				priorityStr,
-				task.Todo,
+				wordWrap(task.Todo),
 				task.AdditionalTags["time"],
 			}
 		}
@@ -177,5 +178,24 @@ func printListTable(list todo.TaskList) {
 		listData = append(listData, listItem)
 	}
 
-	pterm.DefaultTable.WithHasHeader().WithData(listData).Render()
+	pterm.DefaultTable.WithHasHeader().WithHeaderRowSeparator("-").WithData(listData).Render()
+}
+
+func wordWrap(s string) string {
+	if len(s) < 50 {
+		return s
+	}
+
+	var wrapped string
+	var line string
+	for _, word := range strings.Split(s, " ") {
+		if len(line)+len(word) > 50 {
+			wrapped += line + "\n"
+			line = ""
+		}
+		line += word + " "
+	}
+	wrapped += line
+
+	return wrapped
 }
