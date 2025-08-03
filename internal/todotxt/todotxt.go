@@ -17,8 +17,10 @@ func AddTask(task todo.Task) (*todo.Task, error) {
 	task.Projects = append(task.Projects, projects...)
 	task.Contexts = append(task.Contexts, contexts...)
 
-	// add created date
-	task.CreatedDate = time.Now()
+	// add created date if not set
+	if task.CreatedDate.IsZero() {
+		task.CreatedDate = time.Now()
+	}
 
 	// load tasks
 	list, err := todo.LoadFromPath(config.GetTodoTxtPath())

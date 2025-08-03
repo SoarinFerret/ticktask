@@ -4,6 +4,9 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,6 +28,13 @@ var addCmd = &cobra.Command{
 
 		timeSpent, _ := cmd.Flags().GetString("time")
 		complete, _ := cmd.Flags().GetBool("complete")
+
+		date, _ := cmd.Flags().GetString("date")
+		y, _ := cmd.Flags().GetBool("yesterday")
+		if y {
+			date = "-1d"
+		}
+
 		timeDuration, err := time.ParseDuration(timeSpent)
 		if err != nil {
 			pExit("Error parsing time: ", err)
@@ -60,6 +70,18 @@ var addCmd = &cobra.Command{
 			task.Complete()
 		}
 
+		// parse date if provided
+		if date != "0d" {
+			t, err := customDateParser(date)
+			if err != nil {
+				pExit("Error parsing date: ", err)
+			}
+			task.CreatedDate = t
+			if task.Completed {
+				task.CompletedDate = t
+			}
+		}
+
 		task, err = todotxt.AddTask(*task)
 		if err != nil {
 			pExit("Error adding task: ", err)
@@ -91,5 +113,56 @@ func init() {
 	addCmd.Flags().StringP("time", "t", "0m", "The time spent on the task")
 	addCmd.Flags().StringP("priority", "p", "", "The priority of the task (A-Z)")
 	addCmd.Flags().BoolP("complete", "c", false, "Mark the task as complete")
+	addCmd.Flags().StringP("date", "d", "0d", "Date the task should have been added (e.g. 2024-01-01 or -1d for yesterday)")
+	addCmd.Flags().BoolP("yesterday", "y", false, "Shortcut for --date=-1d")
+}
 
+func customDateParser(date string) (time.Time, error) {
+	// if date is in the format of +1d or -1d, parse it as a duration. Format accepts days, weeks, and months
+	if strings.HasPrefix(date, "+") || strings.HasPrefix(date, "-") {
+		// custom duration parser using regexp
+		days, err := parseCustomDuration(date)
+		if err != nil {
+			return time.Time{}, err
+		}
+
+		return time.Now().AddDate(0, 0, days), nil
+	}
+	// otherwise, parse it as a date
+	t, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return t, nil
+}
+
+func parseCustomDuration(input string) (days int, err error) {
+	re := regexp.MustCompile(`^([+-])(\d+)([dwmy])$`)
+	matches := re.FindStringSubmatch(input)
+	if matches == nil {
+		return 0, fmt.Errorf("invalid duration format: %s", input)
+	}
+
+	sign, valueStr, unit := matches[1], matches[2], matches[3]
+	value, _ := strconv.Atoi(valueStr)
+
+	// Convert unit to days
+	switch unit {
+	case "d":
+		// 1 day
+	case "w":
+		value *= 7
+	case "m":
+		value *= 30
+	case "y":
+		value *= 365
+	default:
+		return 0, fmt.Errorf("unknown unit: %s", unit)
+	}
+
+	if sign == "-" {
+		value = -value
+	}
+
+	return value, nil
 }
