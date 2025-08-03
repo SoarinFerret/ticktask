@@ -35,8 +35,6 @@ To change the default configuration, edit the file at
 			pExit("Error writing configuration to stdout: ", err)
 		}
 		pterm.Println(string(b))
-		return
-
 	},
 }
 

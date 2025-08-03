@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"strconv"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/KEINOS/go-todotxt/todo"
 	"github.com/spf13/cobra"
@@ -67,8 +67,6 @@ var listTodoCmd = &cobra.Command{
 		list.Sort(todo.SortPriorityAsc)
 
 		printListTable(list)
-
-		return
 	},
 }
 
