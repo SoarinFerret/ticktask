@@ -284,3 +284,23 @@ func EditTask(task todo.Task) (*todo.Task, error) {
 
 	return oldTask, nil
 }
+
+// FilterByDate returns a filter for tasks that exist on / after the date.
+func FilterByDateRange(startDate time.Time, endDate time.Time) todo.Predicate {
+	return func(t todo.Task) bool {
+		return t.CompletedDate.After(startDate) && t.CompletedDate.Before(endDate)
+	}
+}
+
+func GetTotalTimeSpent(list todo.TaskList) time.Duration {
+	total := time.Duration(0)
+	for _, task := range list {
+		if timeSpent, exists := task.AdditionalTags["time"]; exists {
+			duration, err := time.ParseDuration(timeSpent)
+			if err == nil {
+				total += duration
+			}
+		}
+	}
+	return total
+}
